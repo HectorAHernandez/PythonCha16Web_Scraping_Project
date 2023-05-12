@@ -14,6 +14,73 @@
 # example:
 # (web_scraping) PS C:\Python...\cha16\Web..._Project> python -m idlelib.idle
 
+# RE-CREATING A PYTHON PROJECT/ENVIRONMENT IN ANOTHER COMPUTER:
+# However, you should be able to re-create your Python environment on a
+# different computer so that you can run your program or continue developing
+# it there. How can you make that happen when you treat your virtual
+# environment as disposable and won't commit it to version control?
+
+# Pin Your Dependencies
+# To make your virtual environment reproducible, you need a way to describe its
+# contents. The most common way to do this is by creating a requirements.txt
+# file while your virtual environment is active, using the command:
+
+# (venv) PS> python -m pip freeze > requirements.txt
+
+# This command pipes the output of pip freeze into a new file called
+# requirements.txt. If you open the file, then you'll notice that it contains a
+# list of the external dependencies currently installed in your virtual environment.
+
+# This list is a recipe for pip to know which version of which package to install.
+# As long as you keep this requirements.txt file up to date, you can always
+# re-create the virtual environment that you're working in, even after deleting
+# the venv/ folder or moving to a different computer altogether, using these
+# commands:
+
+# (venv) PS> deactivate
+# PS> python -m venv new-venv
+# PS> new-venv\Scripts\activate
+# (new-venv) PS> python -m pip install -r requirements.txt
+# In the example code snippet above, you created a new virtual environment
+# called new-venv, activated it, and installed all external dependencies that
+# you previously recorded in your requirements.txt file.
+
+# If you use pip list to inspect the currently installed dependencies, then
+# you'll see that both virtual environments, venv and new-venv, now contain the
+# same external packages.
+
+# Note: By committing your requirements.txt file to version control, you can
+# ship your project code with the recipe that allows your users and
+# collaborators to re-create the same virtual environment on their machines.
+
+# Keep in mind that while this is a widespread way to ship dependency information
+# with a code project in Python, it isn't deterministic:
+
+# Python Version: This requirements file doesn't include information about which
+# version of Python you used as your base Python interpreter when creating
+# the virtual environment.
+# Sub-Dependencies: Depending on how you create your requirements file, it may
+# not include version information about sub-dependencies of your dependencies.
+# This means that someone could get a different version of a subpackage if that
+# package was silently updated after you created your requirements file.
+# You can't easily solve either of these issues with requirements.txt alone,
+# but many third-party dependency management tools attempt to address them to
+# guarantee deterministic builds:
+
+# requirements.txt using pip-tools
+# Pipfile.lock using Pipenv
+# poetry.lock using Poetry
+# Projects that integrate the virtual environment workflow into their features
+# but go beyond that will also often include ways to create lock files that
+# allow deterministic builds of your environments.
+
+# Avoid Virtual Environments in Production
+# You might wonder how to include and activate your virtual environment when
+# deploying a project to production. In most cases, you don't want to include
+# your virtual environment folder in remote online locations:
+
+# GitHub: Don't push the venv/ folder to GitHub.
+
 
 # Using HTML Parser Beautiful Soup:
 """Althugh regular expressions are great for pattern matching in general,
@@ -47,28 +114,28 @@ print(f"*** content of soup --> ***\n {soup.get_text()}")
 #                                      removing any HTML tags automatically
 # output:
 # *** content of soup --> ***
-# 
-#
-#Profile: Dionysus
 #
 #
-#
-#
-#
-#Name: Dionysus
-#
-#Hometown: Mount Olympus
-#
-#Favorite animal: Leopard 
-#
-#Favorite Color: Wine
+# Profile: Dionysus
 #
 #
 #
 #
-#>>>
+#
+# Name: Dionysus
+#
+# Hometown: Mount Olympus
+#
+# Favorite animal: Leopard
+#
+# Favorite Color: Wine
+#
+#
+#
+#
+# >>>
 
-#practice a bit with this website: http://tutorialsninja.com/demo/ also:
+# practice a bit with this website: http://tutorialsninja.com/demo/ also:
 #    http://omayo.blogspot.com/
 
 """ there are a lot of blank lines in this output!!! These are the result of
@@ -97,7 +164,7 @@ actually instances/objects of the Tag object that is provided by the Beautiful
 Soup. Tag objects provide a simple interface for working wih the information
 they contain.
 Let's explore this a little y first unpacking the Tag objects from the list:"""
-image1, image2 = soup.findAll('img')
+image1, image2 = soup.findAll("img")
 
 # Each Tag object has a .name property that returns a string  containing the
 # HTML tag type:
@@ -192,7 +259,7 @@ print(f"\n *** profiles html --> {html}")
 print(f"\n *** Exercise # 2 ***")
 soup = BeautifulSoup(html, "html.parser")
 href_in_page_list = []
-all_links_object = soup.findAll('a')
+all_links_object = soup.findAll("a")
 
 for link in all_links_object:
     href_in_page_list.append(link["href"])
@@ -216,4 +283,3 @@ for href in href_in_page_list:
     html = new_page.read().decode("utf-8")
     soup = BeautifulSoup(html, "html.parser")
     print(f"\n\n ******* Searched Page --> {soup.get_text()}")
-    

@@ -14,6 +14,73 @@
 # example:
 # (web_scraping) PS C:\Python...\cha16\Web..._Project> python -m idlelib.idle
 
+# RE-CREATING A PYTHON PROJECT/ENVIRONMENT IN ANOTHER COMPUTER:
+# However, you should be able to re-create your Python environment on a
+# different computer so that you can run your program or continue developing
+# it there. How can you make that happen when you treat your virtual
+# environment as disposable and won't commit it to version control?
+
+# Pin Your Dependencies
+# To make your virtual environment reproducible, you need a way to describe its
+# contents. The most common way to do this is by creating a requirements.txt
+# file while your virtual environment is active, using the command:
+
+# (venv) PS> python -m pip freeze > requirements.txt
+
+# This command pipes the output of pip freeze into a new file called
+# requirements.txt. If you open the file, then you'll notice that it contains a
+# list of the external dependencies currently installed in your virtual environment.
+
+# This list is a recipe for pip to know which version of which package to install.
+# As long as you keep this requirements.txt file up to date, you can always
+# re-create the virtual environment that you're working in, even after deleting
+# the venv/ folder or moving to a different computer altogether, using these
+# commands:
+
+# (venv) PS> deactivate
+# PS> python -m venv new-venv
+# PS> new-venv\Scripts\activate
+# (new-venv) PS> python -m pip install -r requirements.txt
+# In the example code snippet above, you created a new virtual environment
+# called new-venv, activated it, and installed all external dependencies that
+# you previously recorded in your requirements.txt file.
+
+# If you use pip list to inspect the currently installed dependencies, then
+# you'll see that both virtual environments, venv and new-venv, now contain the
+# same external packages.
+
+# Note: By committing your requirements.txt file to version control, you can
+# ship your project code with the recipe that allows your users and
+# collaborators to re-create the same virtual environment on their machines.
+
+# Keep in mind that while this is a widespread way to ship dependency information
+# with a code project in Python, it isn't deterministic:
+
+# Python Version: This requirements file doesn't include information about which
+# version of Python you used as your base Python interpreter when creating
+# the virtual environment.
+# Sub-Dependencies: Depending on how you create your requirements file, it may
+# not include version information about sub-dependencies of your dependencies.
+# This means that someone could get a different version of a subpackage if that
+# package was silently updated after you created your requirements file.
+# You can't easily solve either of these issues with requirements.txt alone,
+# but many third-party dependency management tools attempt to address them to
+# guarantee deterministic builds:
+
+# requirements.txt using pip-tools
+# Pipfile.lock using Pipenv
+# poetry.lock using Poetry
+# Projects that integrate the virtual environment workflow into their features
+# but go beyond that will also often include ways to create lock files that
+# allow deterministic builds of your environments.
+
+# Avoid Virtual Environments in Production
+# You might wonder how to include and activate your virtual environment when
+# deploying a project to production. In most cases, you don't want to include
+# your virtual environment folder in remote online locations:
+
+# GitHub: Don't push the venv/ folder to GitHub.
+
 
 # Interacting with HTML Forms:
 """The Python standard library does not provide a built-in means for working
@@ -54,6 +121,7 @@ Required-by:"""
 
 # CREATE A Browser OBJECT, by below command:
 import mechanicalsoup
+
 browser = mechanicalsoup.Browser()
 
 """Browser objects represent the headless web browser. We can use them to
@@ -127,7 +195,7 @@ import mechanicalsoup
 browser = mechanicalsoup.Browser()
 url = "http://olympus.realpython.org/login"
 login_page = browser.get(url)  # In Reponse API fomat
-login_html = login_page.soup   # .soup In html format to use BS4
+login_html = login_page.soup  # .soup In html format to use BS4
 
 # 2
 login_form = login_html.select("form")[0]  # using the soup object login_html
@@ -277,8 +345,7 @@ current_page_text = current_page.text  # converting to 'text' (string)to be able
 #       to scrape using .find() string method.
 
 print(f"current_page_in_text --> {current_page_text}")
-index_of_returned_message = \
-                          current_page_text.find('Wrong username or password!')
+index_of_returned_message = current_page_text.find("Wrong username or password!")
 if index_of_returned_message != -1:
     print(f"Unsuccessful login, please review credential")
 else:
@@ -286,12 +353,12 @@ else:
 
 # Another way to implement the above:
 import re  # import the Regular Expressions module
-returned_msg = re.search('Wrong username or password!', current_page_text)
+
+returned_msg = re.search("Wrong username or password!", current_page_text)
 if returned_msg.group() == "Wrong username or password!":
     print(f"Using re.search() Unsuccessful login, please review credential")
 else:
     print(f"Using re.search() successful login!!!")
-
 
 
 # INTERACT WITH WEBsit in Real Time:
@@ -309,17 +376,18 @@ Below code opens the /dice page, scrapes the result, and prints it to the
 console:"""
 print(f"\n ** Dice Rolling **")
 import mechanicalsoup
+
 browser = mechanicalsoup.Browser()
 url = "http://olympus.realpython.org/dice"
 dice_page = browser.get(url)
 
 dice_soup = dice_page.soup
-#result = dice_soup.select("h2")[0].text  # using h2 tag.
+# result = dice_soup.select("h2")[0].text  # using h2 tag.
 # the .soup.select() method use the locator of the page element.
 result = dice_soup.select("#result")[0].text  # using unique id for h2 tag.
 # another way, with more steps:
-#result_tag = dice_soup.select("h2")[0]
-#result = result_tag.text
+# result_tag = dice_soup.select("h2")[0]
+# result = result_tag.text
 print(f"The result of the dice roll is --> {result}")
 
 """This example uses the BeautifulSoup object's .select() method to find the
@@ -334,6 +402,7 @@ Python to pause running for 10 seconds. We can do this with sleep() function
 from Python's Time module. sleep() takes a single argument that represents the
 amount of time to sleep in seconds. Here example of how sleep works:"""
 import time
+
 print("\nI'am about to wai for 5 seconds")
 time.sleep(5)
 print("Done waiting")
@@ -343,6 +412,7 @@ print("Done waiting")
 # Below the new code with the loop and waiting 10 seconds:
 import time
 import mechanicalsoup
+
 browser = mechanicalsoup.Browser()
 url = "http://olympus.realpython.org/dice"
 
@@ -418,5 +488,3 @@ for i in range(4):
 
     if i < 3:
         time.sleep(3)
-
-    

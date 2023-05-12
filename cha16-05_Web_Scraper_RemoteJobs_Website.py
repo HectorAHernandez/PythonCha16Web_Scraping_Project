@@ -14,6 +14,73 @@
 # example:
 # (web_scraping) PS C:\Python...\cha16\Web..._Project> python -m idlelib.idle
 
+# RE-CREATING A PYTHON PROJECT/ENVIRONMENT IN ANOTHER COMPUTER:
+# However, you should be able to re-create your Python environment on a
+# different computer so that you can run your program or continue developing
+# it there. How can you make that happen when you treat your virtual
+# environment as disposable and won't commit it to version control?
+
+# Pin Your Dependencies
+# To make your virtual environment reproducible, you need a way to describe its
+# contents. The most common way to do this is by creating a requirements.txt
+# file while your virtual environment is active, using the command:
+
+# (venv) PS> python -m pip freeze > requirements.txt
+
+# This command pipes the output of pip freeze into a new file called
+# requirements.txt. If you open the file, then you'll notice that it contains a
+# list of the external dependencies currently installed in your virtual environment.
+
+# This list is a recipe for pip to know which version of which package to install.
+# As long as you keep this requirements.txt file up to date, you can always
+# re-create the virtual environment that you're working in, even after deleting
+# the venv/ folder or moving to a different computer altogether, using these
+# commands:
+
+# (venv) PS> deactivate
+# PS> python -m venv new-venv
+# PS> new-venv\Scripts\activate
+# (new-venv) PS> python -m pip install -r requirements.txt
+# In the example code snippet above, you created a new virtual environment
+# called new-venv, activated it, and installed all external dependencies that
+# you previously recorded in your requirements.txt file.
+
+# If you use pip list to inspect the currently installed dependencies, then
+# you'll see that both virtual environments, venv and new-venv, now contain the
+# same external packages.
+
+# Note: By committing your requirements.txt file to version control, you can
+# ship your project code with the recipe that allows your users and
+# collaborators to re-create the same virtual environment on their machines.
+
+# Keep in mind that while this is a widespread way to ship dependency information
+# with a code project in Python, it isn't deterministic:
+
+# Python Version: This requirements file doesn't include information about which
+# version of Python you used as your base Python interpreter when creating
+# the virtual environment.
+# Sub-Dependencies: Depending on how you create your requirements file, it may
+# not include version information about sub-dependencies of your dependencies.
+# This means that someone could get a different version of a subpackage if that
+# package was silently updated after you created your requirements file.
+# You can't easily solve either of these issues with requirements.txt alone,
+# but many third-party dependency management tools attempt to address them to
+# guarantee deterministic builds:
+
+# requirements.txt using pip-tools
+# Pipfile.lock using Pipenv
+# poetry.lock using Poetry
+# Projects that integrate the virtual environment workflow into their features
+# but go beyond that will also often include ways to create lock files that
+# allow deterministic builds of your environments.
+
+# Avoid Virtual Environments in Production
+# You might wonder how to include and activate your virtual environment when
+# deploying a project to production. In most cases, you don't want to include
+# your virtual environment folder in remote online locations:
+
+# GitHub: Don't push the venv/ folder to GitHub.
+
 
 # Beautiful Soup Web Scraper Tutorial:
 
@@ -31,7 +98,7 @@ soup = BeautifulSoup(web_page.content, "html.parser")
 
 # Find Elements by ID
 # Step # 3: Create/get the higher level HTML element containing ALL the
-#           repetitives HTML elements containing the data (or HTML elements) we
+#           repetitive HTML elements containing the data (or HTML elements) we
 #           want to scrape.
 #  results = soup.find(id="ResultsContainer")
 # results = soup.find_all("div", data-testid="new-job-feed-wrapper")
@@ -40,10 +107,10 @@ results = soup.find("div", class_="container pt-4")
 # print(f"\n *** Result Container with prettify() ***\n {results.prettify()}")
 
 # Find Elements by HTML Class Name
-"""You’ve seen that every job posting is wrapped in a <div> element with the
+"""You've seen that every job posting is wrapped in a <div> element with the
 class="job". Now you can work with your new object called results and
 select only the job postings in it. These are, after all, the parts of the HTML
-that you’re interested in! You can do this in one line of code:"""
+that you're interested in! You can do this in one line of code:"""
 
 # Step # 4: Create/get a List of ALL jobs or the INDIVIDUAL HTML element
 #           containing ONE specific repetitive HTML elements containing the
@@ -52,7 +119,7 @@ that you’re interested in! You can do this in one line of code:"""
 import re
 
 job_elements = results.find_all(href=re.compile("/job/"))
-# NOTE: pay attention to the underscare character '_' after the keyword class_
+# NOTE: pay attention to the underscore character '_' after the keyword class_
 
 """Here, you call .find_all() on a Beautiful Soup object, which returns an
 iterable containing all the HTML for all the job listings displayed on that
@@ -66,8 +133,8 @@ Take a look at all of them:"""
 for job_element in job_elements:
     print(job_element.prettify(), end="\n" * 4)
 
-"""That’s a readable list of jobs that also includes the company name and each
-job’s location. However, you’re looking for a position as a software developer,
+"""That's a readable list of jobs that also includes the company name and each
+job's location. However, you're looking for a position as a software developer,
 and these results contain job postings in many other fields as well."""
 
 # Pass a Function to a Beautiful Soup Method (This intent to solve the above
@@ -85,7 +152,7 @@ filtered_jobs = results.find_all(
 )
 
 
-"""Now you’re passing an anonymous (lambda) function to the string= argument.
+"""Now you're passing an anonymous (lambda) function to the string= argument.
 The lambda function looks at the text of each <h1> element (represented by
 tag_text_or_job_title variable), converts it to lowercase, and checks whether
 the substring "python" is found anywhere in it. You can check whether you
@@ -108,9 +175,9 @@ all_python_job_elements = [
 #  for company location and title.
 """
 You added a list comprehension that operates on each of the <h1> title elements
-in filtered_jobs that you got by filtering with the lambda expression. You’re
+in filtered_jobs that you got by filtering with the lambda expression. You're
 selecting the parent element of the parent element of the parent element of each
-<h1> title element. That’s one generations up!
+<h1> title element. That's one generations up!
 --> Here the parent<div class="job" data-order="4" data-slug="bmat-senior-backend-engineer" data-tags="python,postgresql,django,mysql,mongodb">
  <a class="go_button" href="/jobs/bmat-senior-backend-engineer.html">
   Read more
