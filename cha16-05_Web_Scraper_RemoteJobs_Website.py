@@ -22,7 +22,7 @@ import requests
 
 from bs4 import BeautifulSoup
 
-URL = "https://remote.co/remote-jobs/developer/"   # Remote Jobs practice website
+URL = "https://remote.co/remote-jobs/developer/"  # Remote Jobs practice website
 web_page = requests.get(URL)
 
 # Step # 2: Create the HTML soup version of the page
@@ -37,7 +37,7 @@ soup = BeautifulSoup(web_page.content, "html.parser")
 # results = soup.find_all("div", data-testid="new-job-feed-wrapper")
 
 results = soup.find("div", class_="container pt-4")
-#print(f"\n *** Result Container with prettify() ***\n {results.prettify()}")
+# print(f"\n *** Result Container with prettify() ***\n {results.prettify()}")
 
 # Find Elements by HTML Class Name
 """You’ve seen that every job posting is wrapped in a <div> element with the
@@ -48,8 +48,9 @@ that you’re interested in! You can do this in one line of code:"""
 # Step # 4: Create/get a List of ALL jobs or the INDIVIDUAL HTML element
 #           containing ONE specific repetitive HTML elements containing the
 #           data (or HTML elements) we want to scrape.
-#job_elements = results.find_all("a")
+# job_elements = results.find_all("a")
 import re
+
 job_elements = results.find_all(href=re.compile("/job/"))
 # NOTE: pay attention to the underscare character '_' after the keyword class_
 
@@ -63,7 +64,7 @@ attribute -class="card-content" -
 Take a look at all of them:"""
 
 for job_element in job_elements:
-    print(job_element.prettify(), end="\n"*4)
+    print(job_element.prettify(), end="\n" * 4)
 
 """That’s a readable list of jobs that also includes the company name and each
 job’s location. However, you’re looking for a position as a software developer,
@@ -79,8 +80,9 @@ lambda function instead:"""
 #           job title we are SEARCHING FOR (using the keyword Python in the
 #           title or element we need.):
 filtered_jobs = results.find_all(
-    class_="larger", string=lambda tag_text_or_job_title: "software" in \
-    tag_text_or_job_title.lower())
+    class_="larger",
+    string=lambda tag_text_or_job_title: "software" in tag_text_or_job_title.lower(),
+)
 
 
 """Now you’re passing an anonymous (lambda) function to the string= argument.
@@ -89,16 +91,16 @@ tag_text_or_job_title variable), converts it to lowercase, and checks whether
 the substring "python" is found anywhere in it. You can check whether you
 managed to identify all the Python jobs with this approach: """
 
-#print(f" *** length of filtered_jobs --> {len(filtered_jobs)}")  #--> 3
-#print(filtered_jobs)
+# print(f" *** length of filtered_jobs --> {len(filtered_jobs)}")  #--> 3
+# print(filtered_jobs)
 # >>> print(len(filtered_jobs))
 # 10   --> 10 jobs found.
 
 # Step # 6: Filter the job list to include only the ones selected in step 5.
 all_python_job_elements = [
-    hector_h1_element.parent.parent.parent.parent.parent.parent.parent for \
-    hector_h1_element in filtered_jobs
-    ]  # using a List comprehension to select all the HTML tags included in
+    hector_h1_element.parent.parent.parent.parent.parent.parent.parent
+    for hector_h1_element in filtered_jobs
+]  # using a List comprehension to select all the HTML tags included in
 #      the div-class_="job" (whole parent) for the "h1" tags (or jobs)
 #      in the filtered_jobs object, this avoid the 'None" error above.
 #  hector_h2_element.parent --> POINTs or get the whole HTML
@@ -132,18 +134,18 @@ Now you can adapt the code in your for loop to iterate over the parent
 elements instead and provide all the data needed:"""
 
 for job_element in all_python_job_elements:
-    #title_element = job_element.find("h2", class_="title")
-    #company_element = job_element.find("h3", class_="company")
-    #location_element = job_element.find("p", class_="location")
+    # title_element = job_element.find("h2", class_="title")
+    # company_element = job_element.find("h3", class_="company")
+    # location_element = job_element.find("p", class_="location")
 
-    #print(f"\n\n    **** job_element --> {job_element}")
+    # print(f"\n\n    **** job_element --> {job_element}")
 
     title_element = job_element.find(class_="larger")
     posting_date_element = job_element.find("date")
 
     secondary_lines = job_element.find("p", class_="m-0 text-secondary")
     company_element = secondary_lines.string
-    
+
     print(f"\n** job title --> {title_element.text.strip()}")
     print(f"** company --> {str(company_element).strip()}")
     print(f"** posting on --> {posting_date_element.text.strip()}")
@@ -154,7 +156,7 @@ for job_element in all_python_job_elements:
     print(f"\n** job's conditions: ")
     for line in secondary_lines:
         print(f" -- {line.text.strip()}")
-        
+
 
 # Output:
 """
