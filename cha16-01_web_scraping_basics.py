@@ -14,7 +14,72 @@
 # example:
 # (web_scraping) PS C:\Python...\cha16\Web..._Project> python -m idlelib.idle
 
+# RE-CREATING A PYTHON PROJECT/ENVIRONMENT IN ANOTHER COMPUTER:
+# However, you should be able to re-create your Python environment on a
+# different computer so that you can run your program or continue developing
+# it there. How can you make that happen when you treat your virtual
+# environment as disposable and won't commit it to version control?
 
+# Pin Your Dependencies
+# To make your virtual environment reproducible, you need a way to describe its
+# contents. The most common way to do this is by creating a requirements.txt
+# file while your virtual environment is active, using the command:
+
+# (venv) PS> python -m pip freeze > requirements.txt
+
+# This command pipes the output of pip freeze into a new file called
+# requirements.txt. If you open the file, then you'll notice that it contains a
+# list of the external dependencies currently installed in your virtual environment.
+
+# This list is a recipe for pip to know which version of which package to install.
+# As long as you keep this requirements.txt file up to date, you can always
+# re-create the virtual environment that you're working in, even after deleting
+# the venv/ folder or moving to a different computer altogether, using these
+# commands:
+
+# (venv) PS> deactivate
+# PS> python -m venv new-venv
+# PS> new-venv\Scripts\activate
+# (new-venv) PS> python -m pip install -r requirements.txt
+# In the example code snippet above, you created a new virtual environment
+# called new-venv, activated it, and installed all external dependencies that
+# you previously recorded in your requirements.txt file.
+
+# If you use pip list to inspect the currently installed dependencies, then
+# you'll see that both virtual environments, venv and new-venv, now contain the
+# same external packages.
+
+# Note: By committing your requirements.txt file to version control, you can
+# ship your project code with the recipe that allows your users and
+# collaborators to re-create the same virtual environment on their machines.
+
+# Keep in mind that while this is a widespread way to ship dependency information
+# with a code project in Python, it isn't deterministic:
+
+# Python Version: This requirements file doesn't include information about which
+# version of Python you used as your base Python interpreter when creating
+# the virtual environment.
+# Sub-Dependencies: Depending on how you create your requirements file, it may
+# not include version information about sub-dependencies of your dependencies.
+# This means that someone could get a different version of a subpackage if that
+# package was silently updated after you created your requirements file.
+# You can't easily solve either of these issues with requirements.txt alone,
+# but many third-party dependency management tools attempt to address them to
+# guarantee deterministic builds:
+
+# requirements.txt using pip-tools
+# Pipfile.lock using Pipenv
+# poetry.lock using Poetry
+# Projects that integrate the virtual environment workflow into their features
+# but go beyond that will also often include ways to create lock files that
+# allow deterministic builds of your environments.
+
+# Avoid Virtual Environments in Production
+# You might wonder how to include and activate your virtual environment when
+# deploying a project to production. In most cases, you don't want to include
+# your virtual environment folder in remote online locations:
+
+# GitHub: Don't push the venv/ folder to GitHub.
 
 #                      Web_page Scraping chapter
 """Web scraping is the process of collecting and parsing raw data from the Web,
@@ -144,8 +209,8 @@ page_title = html[start_index:end_index]
 print(f"Poseidon title --> '{page_title}'")
 # output: '\n<head>\n<title >Profile: Poseidon<'
 # Poseidon title --> '
-#<head>
-#<title >Profile: Poseidon<'
+# <head>
+# <title >Profile: Poseidon<'
 
 # Whoops! There is a bit of HTML mixed in with the title. Why is that?
 """The HTML for th /profile/poseidon page looks similar to the
@@ -343,7 +408,6 @@ same way as * except that it matches the shortest possible stringof text:>>>
 'Every thing is ELEPHANTS if it is in ELEPHANTS.'>>>"""
 
 
-
 # EXTRACTING TEXT FROM HTML WITH REGULAR EXPRESSIONS:
 """Armed with all this knowledge, let's now try to parse out the title from
 http://olympus.realpython.org/profiles/dionysus, which includes this rather
@@ -379,7 +443,7 @@ h2_pattern = "<h2.*?>.*?</h2.*?>"
 h2_match_result = re.search(h2_pattern, html, re.IGNORECASE)
 name_in_h2 = h2_match_result.group()
 # get rid of the <h2> tag:
-name_in_h2 = re.sub("<.*?>", "" , name_in_h2)
+name_in_h2 = re.sub("<.*?>", "", name_in_h2)
 print(f"name in h2 tag --> {name_in_h2}")
 name = name_in_h2.split(": ")[1]
 print(f"Name content --> {name}")
@@ -391,7 +455,7 @@ animal = re.sub("Favorite animal: ", "", animal)
 animal = re.sub("<.*?>", "", animal)  # get rid of the tag.
 print(f"animal --> {animal}")
 
-# Get what is in between 'Favorite color: ' and '\n' 
+# Get what is in between 'Favorite color: ' and '\n'
 color_src_result = re.search("Favorite Color: .*?\n", html)
 color = color_src_result.group()
 print(f"color result --> {color}")
@@ -428,9 +492,10 @@ and HTML is oftern messy. Moreover, websites change over time. We scrapers that
 matter!! """
 
 # Review exercise:
-# 1- Write a program that grabs the ful HTML from the web page at 
+# 1- Write a program that grabs the ful HTML from the web page at
 # http://olympus.realpython.org/profiles/dionysus
-from urllib.request import urlopen 
+from urllib.request import urlopen
+
 web_page = urlopen("http://olympus.realpython.org/profiles/dionysus")
 html_bytes = web_page.read()
 html = html_bytes.decode("utf-8")
@@ -445,7 +510,7 @@ name = name_result.group()
 # get rid of the tags:
 name = re.sub("<.*?>", "", name)
 # get rid of the 'Name: ' part:
-name = re.sub('Name: ',"", name)
+name = re.sub("Name: ", "", name)
 print(f"name --> {name}")
 
 # fir Favorite Color:
@@ -459,29 +524,3 @@ color = color.split("\n")[0]
 
 # print color:
 print(f"\ncolor -> {color}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
